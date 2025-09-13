@@ -1,5 +1,4 @@
-const puppeteer = require("puppeteer-core");
-const chromium = require("@sparticuz/chromium");
+const { chromium } = require("playwright");
 
 (async () => {
   const searchTerm = process.env.SEARCH_TERM || "haulage trucks UK";
@@ -7,12 +6,20 @@ const chromium = require("@sparticuz/chromium");
   console.log(`🚀 Starting YouTube search for: "${searchTerm}"`);
 
   // Launch browser with serverless-optimized settings
-  const browser = await puppeteer.launch({ 
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    ignoreHTTPSErrors: true,
+  const browser = await chromium.launch({ 
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
+      '--disable-gpu',
+      '--disable-web-security',
+      '--disable-features=VizDisplayCompositor'
+    ]
   });
   
   const page = await browser.newPage();
