@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 
 (async () => {
   const searchTerm = process.env.SEARCH_TERM || "haulage trucks UK";
@@ -8,6 +8,7 @@ const puppeteer = require("puppeteer");
   // Launch browser with Vercel-optimized settings
   const browser = await puppeteer.launch({ 
     headless: true, // Must be headless in serverless
+    executablePath: '/usr/bin/google-chrome-stable', // Use Vercel's Chrome
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -16,7 +17,9 @@ const puppeteer = require("puppeteer");
       '--no-first-run',
       '--no-zygote',
       '--single-process',
-      '--disable-gpu'
+      '--disable-gpu',
+      '--disable-web-security',
+      '--disable-features=VizDisplayCompositor'
     ]
   });
   
