@@ -8,7 +8,7 @@ const puppeteer = require("puppeteer-core");
   // Launch browser with Vercel-optimized settings
   const browser = await puppeteer.launch({ 
     headless: true, // Must be headless in serverless
-    executablePath: '/usr/bin/google-chrome-stable', // Use Vercel's Chrome
+    executablePath: '/opt/chrome/chrome', // Use Vercel's Chrome
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -19,7 +19,10 @@ const puppeteer = require("puppeteer-core");
       '--single-process',
       '--disable-gpu',
       '--disable-web-security',
-      '--disable-features=VizDisplayCompositor'
+      '--disable-features=VizDisplayCompositor',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding'
     ]
   });
   
