@@ -1,12 +1,12 @@
-const { chromium } = require("playwright");
+const puppeteer = require("puppeteer");
 
 (async () => {
   const searchTerm = process.env.SEARCH_TERM || "haulage trucks UK";
 
   console.log(`🚀 Starting YouTube search for: "${searchTerm}"`);
 
-  // Launch browser with serverless-optimized settings
-  const browser = await chromium.launch({ 
+  // Launch browser with Vercel-optimized settings
+  const browser = await puppeteer.launch({ 
     headless: true,
     args: [
       '--no-sandbox',
@@ -18,24 +18,48 @@ const { chromium } = require("playwright");
       '--single-process',
       '--disable-gpu',
       '--disable-web-security',
-      '--disable-features=VizDisplayCompositor'
+      '--disable-features=VizDisplayCompositor',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding',
+      '--disable-extensions',
+      '--disable-plugins',
+      '--disable-images',
+      '--disable-javascript',
+      '--disable-default-apps',
+      '--disable-sync',
+      '--disable-translate',
+      '--hide-scrollbars',
+      '--mute-audio',
+      '--no-default-browser-check',
+      '--no-pings',
+      '--disable-logging',
+      '--disable-permissions-api',
+      '--disable-presentation-api',
+      '--disable-print-preview',
+      '--disable-speech-api',
+      '--disable-file-system',
+      '--disable-dev-tools'
     ]
   });
   
   const page = await browser.newPage();
 
   try {
+    // Set a realistic viewport
+    await page.setViewport({ width: 1280, height: 720 });
+
     // Go to YouTube
     console.log("📺 Navigating to YouTube...");
     await page.goto("https://www.youtube.com", { 
-      waitUntil: "networkidle2",
-      timeout: 15000 
+      waitUntil: "domcontentloaded",
+      timeout: 30000 
     });
 
     // Handle cookie consent dialog
     console.log("🍪 Handling cookie consent...");
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
       const acceptButton = await page.evaluateHandle(() => {
         const selectors = [
@@ -68,6 +92,7 @@ const { chromium } = require("playwright");
       if (acceptButton && acceptButton.asElement()) {
         await acceptButton.asElement().click();
         console.log("✅ Cookie consent accepted");
+        await new Promise(resolve => setTimeout(resolve, 2000));
       } else {
         console.log("ℹ️ No cookie dialog found or already accepted");
       }
@@ -125,10 +150,10 @@ const { chromium } = require("playwright");
 
     // Wait for results
     console.log("⏳ Waiting for search results...");
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     await page.waitForSelector('ytd-video-renderer, ytd-rich-item-renderer, [id="video-title"]', { 
-      timeout: 15000 
+      timeout: 20000 
     });
 
     const firstTitle = await page.evaluate(() => {
