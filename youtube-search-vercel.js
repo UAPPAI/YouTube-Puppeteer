@@ -6,25 +6,68 @@ const puppeteer = require("puppeteer-core");
   console.log(`🚀 Starting YouTube search for: "${searchTerm}"`);
 
   // Launch browser with Vercel-optimized settings
-  const browser = await puppeteer.launch({ 
-    headless: true, // Must be headless in serverless
-    executablePath: '/opt/chrome/chrome', // Use Vercel's Chrome
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--single-process',
-      '--disable-gpu',
-      '--disable-web-security',
-      '--disable-features=VizDisplayCompositor',
-      '--disable-background-timer-throttling',
-      '--disable-backgrounding-occluded-windows',
-      '--disable-renderer-backgrounding'
-    ]
-  });
+  let browser;
+  try {
+    // Try with Vercel's Chrome path first
+    browser = await puppeteer.launch({ 
+      headless: true,
+      executablePath: '/opt/chrome/chrome',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding'
+      ]
+    });
+  } catch (error) {
+    console.log('First Chrome path failed, trying alternative...');
+    try {
+      // Try alternative Chrome path
+      browser = await puppeteer.launch({ 
+        headless: true,
+        executablePath: '/usr/bin/google-chrome-stable',
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
+        ]
+      });
+    } catch (error2) {
+      console.log('Alternative Chrome path failed, trying without executablePath...');
+      // Try without specifying executablePath (let Puppeteer find it)
+      browser = await puppeteer.launch({ 
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
+        ]
+      });
+    }
+  }
   
   const page = await browser.newPage();
 
